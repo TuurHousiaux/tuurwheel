@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Topics Wheel</title>
+    <title>IT1 Topic Selector</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -15,7 +15,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1c2e 0%, #2d3250 100%);
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
             color: #fff;
             display: flex;
             align-items: center;
@@ -37,9 +37,9 @@
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 3rem;
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            background: linear-gradient(45deg, #ff6b00, #ff8533);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -60,10 +60,10 @@
             height: 100%;
             position: relative;
             border-radius: 50%;
-            border: 3px solid #4facfe;
+            border: 3px solid #ff6b00;
             transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
             transform: rotate(0deg);
-            box-shadow: 0 0 50px rgba(79, 172, 254, 0.2);
+            box-shadow: 0 0 50px rgba(255, 107, 0, 0.2);
             background: rgba(255, 255, 255, 0.02);
         }
 
@@ -80,14 +80,14 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             cursor: default;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 107, 0, 0.1);
             border-radius: 8px;
             margin: 0.5rem;
             backdrop-filter: blur(5px);
         }
 
         .topic:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 107, 0, 0.2);
             transform: scale(1.05);
         }
 
@@ -97,14 +97,21 @@
             left: -30px;
             width: 60px;
             height: 60px;
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            background: linear-gradient(45deg, #ff6b00, #ff8533);
             transform: translateY(-50%) rotate(45deg);
-            box-shadow: 0 0 30px rgba(79, 172, 254, 0.4);
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
             z-index: 10;
         }
 
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
         button {
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            background: linear-gradient(45deg, #ff6b00, #ff8533);
             border: none;
             padding: 1.2rem 3rem;
             font-size: 1.3rem;
@@ -113,15 +120,14 @@
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 2rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
         }
 
         button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
         }
 
         button:disabled {
@@ -133,12 +139,12 @@
         .selected-topic {
             margin-top: 2rem;
             padding: 2rem;
-            background: rgba(79, 172, 254, 0.1);
+            background: rgba(255, 107, 0, 0.1);
             border-radius: 15px;
             font-size: 1.4rem;
             opacity: 0;
             transition: all 0.5s;
-            border: 1px solid rgba(79, 172, 254, 0.2);
+            border: 1px solid rgba(255, 107, 0, 0.2);
             backdrop-filter: blur(10px);
             transform: translateY(20px);
         }
@@ -172,23 +178,30 @@
                 height: 40px;
                 left: -20px;
             }
+
+            .button-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>IT Topics Wheel</h1>
+        <h1>IT1 Topic Selector</h1>
         <div class="wheel-container">
             <div class="wheel">
                 <div class="marker"></div>
             </div>
         </div>
-        <button id="spinButton">Spin the Wheel</button>
+        <div class="button-container">
+            <button id="spinButton">Spin the Wheel</button>
+            <button id="resetButton" disabled>Reset Topics</button>
+        </div>
         <div id="selectedTopic" class="selected-topic"></div>
     </div>
 
     <script>
-        const topics = [
+        const allTopics = [
             "Mastering Windows Patch Management: Intune Update Cycles Unleashed",
             "Zero-Touch App Updates: Automating with WinGet & Intune",
             "Fortress Windows: Essential Hardening Strategies for Maximum Security",
@@ -197,29 +210,55 @@
             "No Access for Strangers: Blocking Unmanaged Devices with Conditional Access"
         ];
 
+        let topics = [...allTopics];
         const wheel = document.querySelector('.wheel');
         const spinButton = document.getElementById('spinButton');
+        const resetButton = document.getElementById('resetButton');
         const selectedTopic = document.getElementById('selectedTopic');
         let currentRotation = 0;
         let isSpinning = false;
 
-        // Create topic elements with improved positioning and styling
-        topics.forEach((topic, index) => {
-            const topicElement = document.createElement('div');
-            topicElement.className = 'topic';
-            topicElement.textContent = topic;
-            const angle = (360 / topics.length) * index;
-            topicElement.style.transform = `rotate(${angle}deg) translateX(-50%)`;
-            wheel.appendChild(topicElement);
-        });
+        function createWheel() {
+            wheel.innerHTML = '<div class="marker"></div>';
+            topics.forEach((topic, index) => {
+                const topicElement = document.createElement('div');
+                topicElement.className = 'topic';
+                topicElement.textContent = topic;
+                const angle = (360 / topics.length) * index;
+                topicElement.style.transform = `rotate(${angle}deg) translateX(-50%)`;
+                wheel.appendChild(topicElement);
+            });
+        }
+
+        function removeSelectedTopic() {
+            const normalizedRotation = currentRotation % 360;
+            const topicIndex = Math.floor(((360 - (normalizedRotation % 360)) / (360 / topics.length))) % topics.length;
+            topics.splice(topicIndex, 1);
+            createWheel();
+            if (topics.length === 0) {
+                spinButton.disabled = true;
+                resetButton.disabled = false;
+            }
+        }
+
+        function resetTopics() {
+            topics = [...allTopics];
+            currentRotation = 0;
+            wheel.style.transform = 'rotate(0deg)';
+            createWheel();
+            spinButton.disabled = false;
+            resetButton.disabled = true;
+            selectedTopic.classList.remove('visible');
+        }
+
+        createWheel();
 
         spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
+            if (isSpinning || topics.length === 0) return;
             isSpinning = true;
             spinButton.disabled = true;
             selectedTopic.classList.remove('visible');
 
-            // Enhanced spinning animation
             const rotations = 5 + Math.random() * 5;
             const randomAngle = Math.random() * 360;
             const totalRotation = (360 * rotations) + randomAngle;
@@ -227,7 +266,6 @@
 
             wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-            // Calculate selected topic with improved timing
             setTimeout(() => {
                 const normalizedRotation = currentRotation % 360;
                 const topicIndex = Math.floor(((360 - (normalizedRotation % 360)) / (360 / topics.length))) % topics.length;
@@ -235,8 +273,11 @@
                 selectedTopic.classList.add('visible');
                 isSpinning = false;
                 spinButton.disabled = false;
-            }, 5000); // Increased to 5 seconds for smoother animation
+                removeSelectedTopic();
+            }, 5000);
         });
+
+        resetButton.addEventListener('click', resetTopics);
     </script>
 </body>
 </html> 
