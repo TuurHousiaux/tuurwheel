@@ -60,18 +60,22 @@
             height: 600px;
             margin: 2rem auto;
             perspective: 1000px;
+            overflow: visible;
         }
 
         .wheel {
             width: 100%;
             height: 100%;
             position: relative;
-            border-radius: 50%;
             border: 3px solid #ff6b00;
-            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            transform: rotate(0deg);
+            transition: transform 0.1s linear;
+            transform: translateY(0);
             box-shadow: 0 0 50px rgba(255, 107, 0, 0.2);
             background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .topics-container {
@@ -103,6 +107,8 @@
             pointer-events: auto;
             transform-origin: center;
             border: 2px solid transparent;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .topic.highlighted {
@@ -215,6 +221,49 @@
             background: linear-gradient(45deg, #ff4444, #ff6666);
         }
 
+        .mascot {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            bottom: -60px;
+            right: -60px;
+            z-index: 20;
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .mascot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .mascot.pulling {
+            animation: pull 0.5s infinite alternate;
+        }
+
+        @keyframes pull {
+            0% {
+                transform: rotate(0deg) translateY(0);
+            }
+            100% {
+                transform: rotate(-15deg) translateY(-10px);
+            }
+        }
+
+        .mascot.celebrate {
+            animation: celebrate 0.5s infinite;
+        }
+
+        @keyframes celebrate {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(10deg);
+            }
+        }
+
         @media (max-width: 768px) {
             .wheel-container {
                 width: 350px;
@@ -266,6 +315,9 @@
                 <div class="marker"></div>
             </div>
             <div class="topics-container"></div>
+            <div class="mascot">
+                <img src="mascot.png" alt="Company Mascot">
+            </div>
         </div>
         <div class="button-container">
             <button id="spinButton">Spin the Wheel</button>
@@ -308,7 +360,7 @@
         let selectedTopicIndex = -1;
 
         function createWheel() {
-            wheel.innerHTML = '<div class="marker"></div>';
+            wheel.innerHTML = '';
             topicsContainer.innerHTML = '';
             
             topics.forEach((topic, index) => {
@@ -316,16 +368,9 @@
                 topicElement.className = 'topic';
                 topicElement.textContent = topic;
                 
-                // Bereken de positie van het topic
-                const angle = (360 / topics.length) * index;
-                const radius = 300; // Grotere straal voor topics buiten het wiel
-                const x = Math.cos(angle * Math.PI / 180) * radius;
-                const y = Math.sin(angle * Math.PI / 180) * radius;
-                
-                // Plaats het topic
-                topicElement.style.left = `${300 + x}px`;
-                topicElement.style.top = `${300 + y}px`;
-                topicElement.style.transform = `rotate(${-angle}deg)`;
+                // Plaats topics verticaal
+                const topPosition = (index * 150) + 50; // 150px tussenruimte tussen topics
+                topicElement.style.top = `${topPosition}px`;
                 
                 topicsContainer.appendChild(topicElement);
             });
@@ -368,7 +413,7 @@
         function resetTopics() {
             topics = [...allTopics];
             currentRotation = 0;
-            wheel.style.transform = 'rotate(0deg)';
+            wheel.style.transform = 'translateY(0)';
             createWheel();
             spinButton.disabled = false;
             resetButton.disabled = true;
@@ -383,37 +428,64 @@
             spinButton.disabled = true;
             hideModal();
 
-            const rotations = 5 + Math.random() * 5;
-            const randomAngle = Math.random() * 360;
-            const totalRotation = (360 * rotations) + randomAngle;
-            currentRotation += totalRotation;
+            // Start mascot animatie
+            const mascot = document.querySelector('.mascot');
+            mascot.classList.add('pulling');
 
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            const totalSteps = 50;
+            const stepDuration = 50;
+            let currentStep = 0;
+            let speed = 20;
+            let acceleration = 0.5;
 
-            // Update highlight tijdens het draaien
-            const updateHighlight = setInterval(() => {
-                const normalizedRotation = currentRotation % 360;
-                const topicIndex = Math.floor(((360 - (normalizedRotation % 360)) / (360 / topics.length))) % topics.length;
-                highlightTopic(topicIndex);
-            }, 50);
-
-            setTimeout(() => {
-                clearInterval(updateHighlight);
-                const normalizedRotation = currentRotation % 360;
-                selectedTopicIndex = Math.floor(((360 - (normalizedRotation % 360)) / (360 / topics.length))) % topics.length;
-                const selectedTopic = topics[selectedTopicIndex];
-                
-                // Highlight het geselecteerde topic
-                const topics = document.querySelectorAll('.topic');
-                if (topics[selectedTopicIndex]) {
-                    topics[selectedTopicIndex].classList.remove('highlighted');
-                    topics[selectedTopicIndex].classList.add('selected');
+            const spin = () => {
+                if (currentStep >= totalSteps) {
+                    // Stop de animatie
+                    const normalizedPosition = Math.abs(currentRotation) % (topics.length * 150);
+                    selectedTopicIndex = Math.floor(normalizedPosition / 150) % topics.length;
+                    const selectedTopic = topics[selectedTopicIndex];
+                    
+                    // Highlight het geselecteerde topic
+                    const topics = document.querySelectorAll('.topic');
+                    if (topics[selectedTopicIndex]) {
+                        topics[selectedTopicIndex].classList.remove('highlighted');
+                        topics[selectedTopicIndex].classList.add('selected');
+                    }
+                    
+                    isSpinning = false;
+                    spinButton.disabled = false;
+                    
+                    // Stop pulling animatie en start celebrate
+                    mascot.classList.remove('pulling');
+                    mascot.classList.add('celebrate');
+                    
+                    // Stop celebrate na 2 seconden
+                    setTimeout(() => {
+                        mascot.classList.remove('celebrate');
+                    }, 2000);
+                    
+                    showModal(selectedTopic);
+                    return;
                 }
-                
-                isSpinning = false;
-                spinButton.disabled = false;
-                showModal(selectedTopic);
-            }, 5000);
+
+                // Update positie
+                currentRotation -= speed;
+                wheel.style.transform = `translateY(${currentRotation}px)`;
+
+                // Update highlight
+                const normalizedPosition = Math.abs(currentRotation) % (topics.length * 150);
+                const topicIndex = Math.floor(normalizedPosition / 150) % topics.length;
+                highlightTopic(topicIndex);
+
+                // Bereken nieuwe snelheid
+                speed += acceleration;
+                if (speed > 100) speed = 100;
+
+                currentStep++;
+                setTimeout(spin, stepDuration);
+            };
+
+            spin();
         });
 
         resetButton.addEventListener('click', resetTopics);
