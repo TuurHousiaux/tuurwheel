@@ -67,14 +67,22 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
+        .topics-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
         .topic {
             position: absolute;
-            width: 50%;
-            transform-origin: 100% 50%;
+            width: 200px;
             display: flex;
             align-items: center;
             padding: 1rem 2rem;
-            text-align: right;
+            text-align: center;
             font-size: 1rem;
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
@@ -82,9 +90,10 @@
             transition: all 0.3s;
             background: rgba(255, 107, 0, 0.1);
             border-radius: 8px;
-            margin: 0.5rem;
             backdrop-filter: blur(5px);
-            transform-origin: center;
+            margin-left: -100px;
+            margin-top: -20px;
+            pointer-events: auto;
         }
 
         .topic:hover {
@@ -164,6 +173,8 @@
             .topic {
                 font-size: 0.8rem;
                 padding: 0.5rem 1rem;
+                width: 150px;
+                margin-left: -75px;
             }
 
             h1 {
@@ -193,6 +204,7 @@
             <div class="wheel">
                 <div class="marker"></div>
             </div>
+            <div class="topics-container"></div>
         </div>
         <div class="button-container">
             <button id="spinButton">Spin the Wheel</button>
@@ -213,6 +225,7 @@
 
         let topics = [...allTopics];
         const wheel = document.querySelector('.wheel');
+        const topicsContainer = document.querySelector('.topics-container');
         const spinButton = document.getElementById('spinButton');
         const resetButton = document.getElementById('resetButton');
         const selectedTopic = document.getElementById('selectedTopic');
@@ -221,6 +234,8 @@
 
         function createWheel() {
             wheel.innerHTML = '<div class="marker"></div>';
+            topicsContainer.innerHTML = '';
+            
             topics.forEach((topic, index) => {
                 const topicElement = document.createElement('div');
                 topicElement.className = 'topic';
@@ -233,11 +248,10 @@
                 const y = Math.sin(angle * Math.PI / 180) * radius;
                 
                 // Plaats het topic
-                topicElement.style.left = `${50 + x}px`;
-                topicElement.style.top = `${50 + y}px`;
-                topicElement.style.transform = `rotate(${angle}deg)`;
+                topicElement.style.left = `${300 + x}px`;
+                topicElement.style.top = `${300 + y}px`;
                 
-                wheel.appendChild(topicElement);
+                topicsContainer.appendChild(topicElement);
             });
         }
 
