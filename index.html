@@ -94,6 +94,7 @@
             margin-left: -100px;
             margin-top: -20px;
             pointer-events: auto;
+            transform-origin: center;
         }
 
         .topic:hover {
@@ -250,6 +251,7 @@
                 // Plaats het topic
                 topicElement.style.left = `${300 + x}px`;
                 topicElement.style.top = `${300 + y}px`;
+                topicElement.style.transform = `rotate(${-angle}deg)`;
                 
                 topicsContainer.appendChild(topicElement);
             });
