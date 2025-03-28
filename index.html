@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spin the wheel - A modern work demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>IT Demo Selector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,484 +13,419 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            background: #0f172a;
             color: #fff;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             padding: 2rem;
             overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
+            padding: 2rem;
+        }
+
+        header {
             text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 4rem;
+            position: relative;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
+            font-weight: 800;
             margin-bottom: 1rem;
-            background: linear-gradient(45deg, #ff6b00, #ff8533);
+            background: linear-gradient(135deg, #ff6b00, #ff8533);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            letter-spacing: 1px;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
             font-size: 1.5rem;
-            color: #ff8533;
-            margin-bottom: 3rem;
-            opacity: 0.8;
+            color: #ff6b00;
+            font-weight: 500;
         }
 
-        .wheel-container {
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .topic-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 107, 0, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
             position: relative;
-            width: 600px;
-            height: 600px;
-            margin: 2rem auto;
-            perspective: 1000px;
-            overflow: visible;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
-        .wheel {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            border: 3px solid #ff6b00;
-            transition: transform 0.1s linear;
-            transform: translateY(0);
-            box-shadow: 0 0 50px rgba(255, 107, 0, 0.2);
-            background: rgba(255, 255, 255, 0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .topics-container {
+        .topic-card::before {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
-            pointer-events: none;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 133, 51, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .topic {
-            position: absolute;
-            width: 300px;
-            display: flex;
-            align-items: center;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            font-size: 1.2rem;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            cursor: default;
-            transition: all 0.3s;
+        .topic-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 107, 0, 0.5);
+            box-shadow: 0 20px 40px rgba(255, 107, 0, 0.1);
+        }
+
+        .topic-card:hover::before {
+            opacity: 1;
+        }
+
+        .topic-card.selected {
             background: rgba(255, 107, 0, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-            margin-left: -150px;
-            margin-top: -30px;
-            pointer-events: auto;
-            transform-origin: center;
-            border: 2px solid transparent;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .topic.highlighted {
-            background: rgba(255, 107, 0, 0.3);
             border-color: #ff6b00;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+            transform: scale(1.02);
         }
 
-        .topic.selected {
-            background: rgba(255, 107, 0, 0.4);
-            border-color: #ff8533;
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
+        .topic-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff6b00;
+            line-height: 1.4;
         }
 
-        .marker {
-            position: absolute;
-            top: 50%;
-            left: -30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #ff6b00, #ff8533);
-            transform: translateY(-50%) rotate(45deg);
-            box-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
-            z-index: 10;
+        .topic-card p {
+            color: #ffa366;
+            font-size: 1.1rem;
+            line-height: 1.6;
         }
 
         .button-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
+            text-align: center;
             margin-top: 2rem;
         }
 
-        button {
-            background: linear-gradient(45deg, #ff6b00, #ff8533);
+        .select-button {
+            background: linear-gradient(135deg, #ff6b00, #ff8533);
             border: none;
-            padding: 1.2rem 3rem;
-            font-size: 1.3rem;
+            padding: 1.5rem 4rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: #fff;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
+            letter-spacing: 0.05em;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        button:hover {
+        .select-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .select-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+            box-shadow: 0 15px 40px rgba(255, 107, 0, 0.4);
         }
 
-        button:disabled {
+        .select-button:hover::before {
+            opacity: 1;
+        }
+
+        .select-button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
 
-        .modal {
-            display: none;
+        .result-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            display: none;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .modal-content {
-            background: rgba(45, 45, 45, 0.95);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
+        .result-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .result-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 800px;
             width: 90%;
-            border: 2px solid #ff6b00;
-            box-shadow: 0 0 50px rgba(255, 107, 0, 0.3);
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .modal h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
+        .result-overlay.visible .result-content {
+            transform: translateY(0);
+        }
+
+        .result-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
             color: #ff6b00;
         }
 
-        .modal p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
+        .result-content p {
+            font-size: 1.8rem;
             line-height: 1.6;
+            color: #ff6b00;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 107, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 0, 0.2);
         }
 
-        .modal-buttons {
+        .result-buttons {
             display: flex;
             gap: 1rem;
             justify-content: center;
         }
 
-        .modal button {
-            min-width: 120px;
+        .result-buttons button {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 150px;
         }
 
-        .modal button.remove {
-            background: linear-gradient(45deg, #ff4444, #ff6666);
+        .result-buttons button.remove {
+            background: #ff4444;
+            color: white;
         }
 
-        .mascot {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            bottom: -60px;
-            right: -60px;
-            z-index: 20;
-            transform-origin: center;
-            transition: transform 0.3s ease;
-        }
-
-        .mascot img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .mascot.pulling {
-            animation: pull 0.5s infinite alternate;
-        }
-
-        @keyframes pull {
-            0% {
-                transform: rotate(0deg) translateY(0);
-            }
-            100% {
-                transform: rotate(-15deg) translateY(-10px);
-            }
-        }
-
-        .mascot.celebrate {
-            animation: celebrate 0.5s infinite;
-        }
-
-        @keyframes celebrate {
-            0%, 100% {
-                transform: scale(1) rotate(0deg);
-            }
-            50% {
-                transform: scale(1.1) rotate(10deg);
-            }
+        .result-buttons button.keep {
+            background: #ff6b00;
+            color: white;
         }
 
         @media (max-width: 768px) {
-            .wheel-container {
-                width: 350px;
-                height: 350px;
-            }
-
-            .topic {
-                font-size: 1rem;
+            .container {
                 padding: 1rem;
-                width: 250px;
-                margin-left: -125px;
             }
 
             h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             .subtitle {
                 font-size: 1.2rem;
             }
 
-            .container {
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-card {
                 padding: 1.5rem;
             }
 
-            .marker {
-                width: 40px;
-                height: 40px;
-                left: -20px;
+            .topic-card h3 {
+                font-size: 1.3rem;
             }
 
-            .button-container {
-                flex-direction: column;
+            .select-button {
+                padding: 1.2rem 2.5rem;
+                font-size: 1.2rem;
             }
 
-            .modal-content {
-                padding: 1.5rem;
-                width: 95%;
+            .result-content {
+                padding: 2rem;
+            }
+
+            .result-content h2 {
+                font-size: 2rem;
+            }
+
+            .result-content p {
+                font-size: 1.4rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Spin the wheel</h1>
-        <div class="subtitle">A modern work demo</div>
-        <div class="wheel-container">
-            <div class="wheel">
-                <div class="marker"></div>
+        <header>
+            <h1>Modern work demo's by IT1</h1>
+        </header>
+
+        <div class="topics-grid">
+            <div class="topic-card">
+                <h3>Mastering Windows Update Management</h3>
+                <p>Intune Update Cycles Unleashed - A comprehensive guide to managing Windows updates efficiently</p>
             </div>
-            <div class="topics-container"></div>
-            <div class="mascot">
-                <img src="mascot.png" alt="Company Mascot">
+            <div class="topic-card">
+                <h3>Zero-Touch App Updates</h3>
+                <p>Automating with WinGet & Intune - Streamline your application deployment process</p>
+            </div>
+            <div class="topic-card">
+                <h3>Fortify Windows for SMB</h3>
+                <p>Essential Hardening Strategies for Maximum Security - Protect your Windows environment</p>
+            </div>
+            <div class="topic-card">
+                <h3>One-Click Android App Deployment</h3>
+                <p>Effortless App Pushing to Android - Simplify your mobile app deployment</p>
+            </div>
+            <div class="topic-card">
+                <h3>Work & Personal data Perfectly Separated</h3>
+                <p>Corporate Data Isolation on BYOD - Secure your business data on personal devices</p>
+            </div>
+            <div class="topic-card">
+                <h3>No Access for Strangers</h3>
+                <p>Blocking Unmanaged Devices with Conditional Access - Control device access to your network</p>
             </div>
         </div>
+
         <div class="button-container">
-            <button id="spinButton">Spin the Wheel</button>
-            <button id="resetButton" disabled>Reset Topics</button>
+            <button class="select-button" id="selectButton">Let fate decide</button>
         </div>
     </div>
 
-    <div class="modal" id="topicModal">
-        <div class="modal-content">
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-content">
             <h2>Selected Topic</h2>
-            <p id="modalTopic"></p>
-            <div class="modal-buttons">
-                <button class="remove" id="removeButton">Remove</button>
-                <button id="okButton">OK</button>
+            <p id="selectedTopic"></p>
+            <div class="result-buttons">
+                <button class="remove" id="removeButton">Remove Topic</button>
+                <button class="keep" id="keepButton">Keep Topic</button>
             </div>
         </div>
     </div>
 
     <script>
-        const allTopics = [
-            "Mastering Windows Patch Management: Intune Update Cycles Unleashed",
-            "Zero-Touch App Updates: Automating with WinGet & Intune",
-            "Fortress Windows: Essential Hardening Strategies for Maximum Security",
-            "One-Click Deployment: Effortless App Pushing to Android",
-            "Work & Personal, Perfectly Separated: Corporate Data Isolation on BYOD",
-            "No Access for Strangers: Blocking Unmanaged Devices with Conditional Access"
+        const topics = [
+            {
+                title: "Mastering Windows Update Management",
+                description: "Intune Update Cycles Unleashed - A comprehensive guide to managing Windows updates efficiently"
+            },
+            {
+                title: "Zero-Touch App Updates",
+                description: "Automating with WinGet & Intune - Streamline your application deployment process"
+            },
+            {
+                title: "Fortify Windows for SMB",
+                description: "Essential Hardening Strategies for Maximum Security - Protect your Windows environment"
+            },
+            {
+                title: "One-Click Android App Deployment",
+                description: "Effortless App Pushing to Android - Simplify your mobile app deployment"
+            },
+            {
+                title: "Work & Personal data Perfectly Separated",
+                description: "Corporate Data Isolation on BYOD - Secure your business data on personal devices"
+            },
+            {
+                title: "No Access for Strangers",
+                description: "Blocking Unmanaged Devices with Conditional Access - Control device access to your network"
+            }
         ];
 
-        let topics = [...allTopics];
-        const wheel = document.querySelector('.wheel');
-        const topicsContainer = document.querySelector('.topics-container');
-        const spinButton = document.getElementById('spinButton');
-        const resetButton = document.getElementById('resetButton');
-        const modal = document.getElementById('topicModal');
-        const modalTopic = document.getElementById('modalTopic');
+        let availableTopics = [...topics];
+        const selectButton = document.getElementById('selectButton');
+        const resultOverlay = document.getElementById('resultOverlay');
+        const selectedTopic = document.getElementById('selectedTopic');
         const removeButton = document.getElementById('removeButton');
-        const okButton = document.getElementById('okButton');
-        let currentRotation = 0;
-        let isSpinning = false;
-        let selectedTopicIndex = -1;
+        const keepButton = document.getElementById('keepButton');
+        const topicCards = document.querySelectorAll('.topic-card');
 
-        function createWheel() {
-            wheel.innerHTML = '';
-            topicsContainer.innerHTML = '';
-            
-            topics.forEach((topic, index) => {
-                const topicElement = document.createElement('div');
-                topicElement.className = 'topic';
-                topicElement.textContent = topic;
-                
-                // Plaats topics verticaal
-                const topPosition = (index * 150) + 50; // 150px tussenruimte tussen topics
-                topicElement.style.top = `${topPosition}px`;
-                
-                topicsContainer.appendChild(topicElement);
+        function showResult(topic) {
+            selectedTopic.textContent = topic.title;
+            resultOverlay.style.display = 'flex';
+            setTimeout(() => {
+                resultOverlay.classList.add('visible');
+            }, 10);
+        }
+
+        function hideResult() {
+            resultOverlay.classList.remove('visible');
+            setTimeout(() => {
+                resultOverlay.style.display = 'none';
+            }, 300);
+        }
+
+        function selectRandomTopic() {
+            if (availableTopics.length === 0) {
+                selectButton.disabled = true;
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableTopics.length);
+            const selected = availableTopics[randomIndex];
+            showResult(selected);
+
+            // Highlight the selected card
+            topicCards.forEach(card => {
+                if (card.querySelector('h3').textContent === selected.title) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
             });
         }
 
-        function highlightTopic(index) {
-            // Verwijder highlight van alle topics
-            document.querySelectorAll('.topic').forEach(topic => {
-                topic.classList.remove('highlighted', 'selected');
-            });
+        function removeTopic() {
+            const currentTopic = selectedTopic.textContent;
+            availableTopics = availableTopics.filter(topic => topic.title !== currentTopic);
             
-            // Voeg highlight toe aan het geselecteerde topic
-            const topics = document.querySelectorAll('.topic');
-            if (topics[index]) {
-                topics[index].classList.add('highlighted');
+            // Hide the selected card
+            topicCards.forEach(card => {
+                if (card.querySelector('h3').textContent === currentTopic) {
+                    card.style.display = 'none';
+                }
+            });
+
+            hideResult();
+            if (availableTopics.length === 0) {
+                selectButton.disabled = true;
             }
         }
 
-        function showModal(topic) {
-            modalTopic.textContent = topic;
-            modal.style.display = 'flex';
-        }
-
-        function hideModal() {
-            modal.style.display = 'none';
-        }
-
-        function removeSelectedTopic() {
-            if (selectedTopicIndex >= 0) {
-                topics.splice(selectedTopicIndex, 1);
-                createWheel();
-                if (topics.length === 0) {
-                    spinButton.disabled = true;
-                    resetButton.disabled = false;
-                }
-            }
-            hideModal();
-        }
-
-        function resetTopics() {
-            topics = [...allTopics];
-            currentRotation = 0;
-            wheel.style.transform = 'translateY(0)';
-            createWheel();
-            spinButton.disabled = false;
-            resetButton.disabled = true;
-            hideModal();
-        }
-
-        createWheel();
-
-        spinButton.addEventListener('click', () => {
-            if (isSpinning || topics.length === 0) return;
-            isSpinning = true;
-            spinButton.disabled = true;
-            hideModal();
-
-            // Start mascot animatie
-            const mascot = document.querySelector('.mascot');
-            mascot.classList.add('pulling');
-
-            const totalSteps = 50;
-            const stepDuration = 50;
-            let currentStep = 0;
-            let speed = 20;
-            let acceleration = 0.5;
-
-            const spin = () => {
-                if (currentStep >= totalSteps) {
-                    // Stop de animatie
-                    const normalizedPosition = Math.abs(currentRotation) % (topics.length * 150);
-                    selectedTopicIndex = Math.floor(normalizedPosition / 150) % topics.length;
-                    const selectedTopic = topics[selectedTopicIndex];
-                    
-                    // Highlight het geselecteerde topic
-                    const topics = document.querySelectorAll('.topic');
-                    if (topics[selectedTopicIndex]) {
-                        topics[selectedTopicIndex].classList.remove('highlighted');
-                        topics[selectedTopicIndex].classList.add('selected');
-                    }
-                    
-                    isSpinning = false;
-                    spinButton.disabled = false;
-                    
-                    // Stop pulling animatie en start celebrate
-                    mascot.classList.remove('pulling');
-                    mascot.classList.add('celebrate');
-                    
-                    // Stop celebrate na 2 seconden
-                    setTimeout(() => {
-                        mascot.classList.remove('celebrate');
-                    }, 2000);
-                    
-                    showModal(selectedTopic);
-                    return;
-                }
-
-                // Update positie
-                currentRotation -= speed;
-                wheel.style.transform = `translateY(${currentRotation}px)`;
-
-                // Update highlight
-                const normalizedPosition = Math.abs(currentRotation) % (topics.length * 150);
-                const topicIndex = Math.floor(normalizedPosition / 150) % topics.length;
-                highlightTopic(topicIndex);
-
-                // Bereken nieuwe snelheid
-                speed += acceleration;
-                if (speed > 100) speed = 100;
-
-                currentStep++;
-                setTimeout(spin, stepDuration);
-            };
-
-            spin();
-        });
-
-        resetButton.addEventListener('click', resetTopics);
-        removeButton.addEventListener('click', removeSelectedTopic);
-        okButton.addEventListener('click', hideModal);
+        selectButton.addEventListener('click', selectRandomTopic);
+        removeButton.addEventListener('click', removeTopic);
+        keepButton.addEventListener('click', hideResult);
     </script>
 </body>
 </html> 
